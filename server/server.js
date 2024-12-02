@@ -13,9 +13,6 @@ const PORT = process.env.PORT || 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// ========== MONGO DB ==========
-const MONGO_URI = 'mongodb+srv://test:test@cluster0.mongodb.net/chatdb?retryWrites=true&w=majority'; // You'll replace this with your URI
-let db;
 
 // Connect to MongoDB
 // MongoClient.connect(MONGO_URI)
