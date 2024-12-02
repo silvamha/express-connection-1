@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import cors from 'cors';
-// import { MongoClient } from 'mongodb';
 
 // ========== INITIALIZATION ==========
 dotenv.config();
@@ -12,18 +11,6 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-// ========== MONGO DB ==========
-const MONGO_URI = 'mongodb+srv://test:test@cluster0.mongodb.net/chatdb?retryWrites=true&w=majority'; // You'll replace this with your URI
-let db;
-
-// Connect to MongoDB
-// MongoClient.connect(MONGO_URI)
-//   .then(client => {
-//     db = client.db('chatdb');
-//     console.log('Connected to MongoDB');
-//   })
-//   .catch(err => console.error('MongoDB connection error:', err));
 
 // ========== MIDDLEWARE ==========
 app.use(cors());
@@ -38,47 +25,6 @@ app.get('/api/health', (req, res) => {
     message: 'Server is running',
     timestamp: new Date().toISOString()
   });
-});
-
-app.get('/api/echo/:message', (req, res) => {
-  const message = req.params.message;
-  res.json({
-    received: message,
-    timestamp: new Date().toISOString()
-  });
-});
-
-app.get('/api/greet', (req, res) => {
-  const name = req.query.name || 'Guest';
-  res.json({
-    message: `Hello, ${name}!`,
-    timestamp: new Date().toISOString()
-  });
-});
-
-// Save chat message
-app.post('/api/chat', async (req, res) => {
-  try {
-    const { message, response } = req.body;
-    await db.collection('chats').insertOne({
-      message,
-      response,
-      timestamp: new Date()
-    });
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Get chat history
-app.get('/api/chat', async (req, res) => {
-  try {
-    const chats = await db.collection('chats').find().sort({ timestamp: -1 }).toArray();
-    res.json(chats);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
 });
 
 // Agent route using MistralAI
@@ -132,13 +78,6 @@ app.post('/api/agent', async (req, res) => {
 
     const data = await response.json();
     
-    // Save to MongoDB
-    await db.collection('chats').insertOne({
-      message,
-      response: data,
-      timestamp: new Date()
-    });
-    
     res.json({
       message: data.choices[0].message.content,
       timestamp: new Date().toISOString()
@@ -153,23 +92,10 @@ app.post('/api/agent', async (req, res) => {
   }
 });
 
-// ========== ERROR HANDLING ==========
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    error: 'Something went wrong!',
-    timestamp: new Date().toISOString()
-  });
-});
-
-// ========== START SERVER ==========
+// Start server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
   console.log('Available routes:');
   console.log('  - GET  /api/health');
-  console.log('  - GET  /api/echo/:message');
-  console.log('  - GET  /api/greet?name=YourName');
   console.log('  - POST /api/agent');
-  console.log('  - POST /api/chat');
-  console.log('  - GET  /api/chat');
 });
