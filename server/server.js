@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import cors from 'cors';
-// import { MongoClient } from 'mongodb';
 
 // ========== INITIALIZATION ==========
 dotenv.config();
@@ -12,18 +11,6 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-// ========== MONGO DB ==========
-const MONGO_URI = 'mongodb+srv://test:test@cluster0.mongodb.net/chatdb?retryWrites=true&w=majority'; // You'll replace this with your URI
-let db;
-
-// Connect to MongoDB
-// MongoClient.connect(MONGO_URI)
-//   .then(client => {
-//     db = client.db('chatdb');
-//     console.log('Connected to MongoDB');
-//   })
-//   .catch(err => console.error('MongoDB connection error:', err));
 
 // ========== MIDDLEWARE ==========
 app.use(cors());
